@@ -1,34 +1,39 @@
 import { useState } from "react";
 import Directory from "../components/Directory";
 import AddEmployeeForm from "../components/AddEmployeeForm";
-import departmentsData from "../data/departments.json";
+
 import type { Department } from "../types";
+import { employeeRepo } from "../repository/employeeRepo";
+import { employeeService, type CreateEmployeeResult } from "../services/employeeService";
 
 export default function EmployeesPage() {
-  var [departments, setDepartments] = useState<Department[]>(
-    departmentsData as Department[]
-  );
+  var repo = employeeRepo();
+  var service = employeeService(repo);
 
-  function addEmployee(firstName: string, lastName: string, departmentName: string) {
-    setDepartments((prev) =>
-      prev.map((dept) => {
-        if (dept.name !== departmentName) return dept;
+  var [departments, setDepartments] = useState<Department[]>(repo.getDepartments());
 
-        return {
-          name: dept.name,
-          employees: dept.employees.concat({
-            firstName: firstName,
-            lastName: lastName || undefined
-          })
-        };
-      })
-    );
+  function createEmployee(first: string, last: string, dept: string): CreateEmployeeResult {
+    var result = service.createEmployee({
+      departments: departments,
+      firstName: first,
+      lastName: last,
+      departmentName: dept
+    });
+
+    if (result.ok) {
+      setDepartments(result.departments);
+    }
+
+    return result;
   }
 
   return (
     <>
       <Directory departments={departments} />
-      <AddEmployeeForm departments={departments} onAddEmployee={addEmployee} />
+      <AddEmployeeForm
+        departments={departments}
+        onCreateEmployee={createEmployee}
+      />
     </>
   );
 }
