@@ -1,58 +1,77 @@
-import { useState } from "react";
 import type { Department } from "../types";
+import { useFormInput } from "../hooks/useFormInput";
+import type { CreateEmployeeResult } from "../services/employeeService";
 
 type AddEmployeeFormProps = {
   departments: Department[];
-  onAddEmployee: (first: string, last: string, dept: string) => void;
+  onCreateEmployee: (first: string, last: string, dept: string) => CreateEmployeeResult;
 };
 
 export default function AddEmployeeForm(props: AddEmployeeFormProps) {
-  var [firstName, setFirstName] = useState("");
-  var [lastName, setLastName] = useState("");
-  var [departmentName, setDepartmentName] = useState(props.departments[0].name);
-  var [error, setError] = useState("");
+  var firstNameInput = useFormInput("");
+  var lastNameInput = useFormInput("");
+  var departmentInput = useFormInput(
+    props.departments.length > 0 ? props.departments[0].name : ""
+  );
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
+    firstNameInput.clearMessages();
+    lastNameInput.clearMessages();
+    departmentInput.clearMessages();
 
-    if (firstName.trim().length < 3) {
-      setError("First name must be at least 3 characters.");
-      return;
-    }
+    var result = props.onCreateEmployee(
+      firstNameInput.value,
+      lastNameInput.value,
+      departmentInput.value
+    )
     
-    props.onAddEmployee(
-      firstName.trim(),
-      lastName.trim(),
-      departmentName
-    );
+    if (!result.ok) {
+      result.errors.forEach((err) => {
+        if (err.field === "firstName") {
+          firstNameInput.setMessages([err.message]);
+        }
+        if (err.field === "department") {
+          departmentInput.setMessages([err.message]);
+        }
+      });
+    return;
+    }
 
-    setFirstName("");
-    setLastName("");
+    firstNameInput.setValue("");
+    lastNameInput.setValue("");
+    firstNameInput.clearMessages();
+    lastNameInput.clearMessages();
+
+    if (props.departments.length > 0) {
+      departmentInput.setValue(props.departments[0].name);
+    }
   }
 
   return (
     <section className="add-employee">
       <h2>Add Employee</h2>
 
-      {error && <p className="form-error">{error}</p>}
-
+      {firstNameInput.messages.map((msg) => (
+      <p className="form-error" key={msg}>{msg}</p>
+      ))}
+      
       <form onSubmit={handleSubmit}>
         <input
           placeholder="First name"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
+          value={firstNameInput.value}
+          onChange={firstNameInput.onChange}
         />
 
         <input
           placeholder="Last name (optional)"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
+          value={lastNameInput.value}
+          onChange={lastNameInput.onChange}
         />
 
         <select
-          value={departmentName}
-          onChange={(e) => setDepartmentName(e.target.value)}
+          value={departmentInput.value}
+          onChange={departmentInput.onChange}
         >
           {props.departments.map((d) => (
             <option key={d.name} value={d.name}>
