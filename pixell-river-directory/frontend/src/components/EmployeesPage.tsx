@@ -10,7 +10,6 @@ import {
 } from "../apis/employeeApi";
 
 export default function EmployeesPage() {
-
   var [departments, setDepartments] = useState<Department[]>([]);
 
   useEffect(() => {
@@ -27,7 +26,11 @@ export default function EmployeesPage() {
     last: string,
     dept: string
   ): Promise<CreateEmployeeResponse> {
-    var result = await createEmployee(first, last, dept);
+    var result = await createEmployeeApi({
+      firstName: first,
+      lastName: last,
+      departmentName: dept
+    });
 
     if (result.ok) {
       setDepartments(result.departments);
