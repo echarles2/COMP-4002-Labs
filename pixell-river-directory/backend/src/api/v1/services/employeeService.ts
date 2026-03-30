@@ -8,14 +8,14 @@ type CreateEmployeeArgs = {
 };
 
 export function employeeService(repo: ReturnType<typeof employeeRepository>) {
-  function getDepartments(): Department[] {
-    return repo.getDepartments();
+  async function getDepartments(): Promise<Department[]> {
+    return await repo.getDepartments();
   }
 
-  function createEmployee(args: CreateEmployeeArgs): CreateEmployeeResult {
+  async function createEmployee(args: CreateEmployeeArgs): Promise<CreateEmployeeResult> {
     var errors: { field: "firstName" | "department"; message: string }[] = [];
 
-    var departments = repo.getDepartments();
+    var departments = await repo.getDepartments();
 
     var deptExists = departments.some((d) => d.name === args.departmentName);
     if (!deptExists) {
@@ -44,7 +44,7 @@ export function employeeService(repo: ReturnType<typeof employeeRepository>) {
       employee.lastName = args.lastName.trim();
     }
 
-    var updatedDepartments = repo.createEmployee(args.departmentName, employee);
+    var updatedDepartments = await repo.createEmployee(args.departmentName, employee);
 
     return {
       ok: true,
