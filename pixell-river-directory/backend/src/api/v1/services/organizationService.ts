@@ -8,11 +8,11 @@ type CreateOrgArgs = {
 };
 
 export function organizationService(repo: ReturnType<typeof organizationRepository>) {
-  function getRoles(): Role[] {
-    return repo.getRoles();
+  async function getRoles(): Promise<Role[]> {
+    return await repo.getRoles();
   }
 
-  function createOrgEntry(args: CreateOrgArgs): CreateOrgResult {
+  async function createOrgEntry(args: CreateOrgArgs): Promise<CreateOrgResult> {
     var errors: { field: "firstName" | "lastName" | "role"; message: string }[] = [];
 
     if (args.firstName.trim().length < 3) {
@@ -34,10 +34,10 @@ export function organizationService(repo: ReturnType<typeof organizationReposito
         field: "role",
         message: "Role is required."
       });
-    } else if (repo.roleExists(args.role)) {
+    } else if (!(await repo.roleExists(args.role))) {
       errors.push({
         field: "role",
-        message: "Role occupied."
+        message: "Role does not exist."
       });
     }
 
@@ -51,7 +51,7 @@ export function organizationService(repo: ReturnType<typeof organizationReposito
       role: args.role.trim()
     };
 
-    var updatedRoles = repo.createRoleEntry(record);
+    var updatedRoles = await repo.createRoleEntry(record);
 
     return {
       ok: true,
