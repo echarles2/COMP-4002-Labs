@@ -1,8 +1,8 @@
 import { useFormInput } from "../hooks/useFormInput";
-import type { CreateOrgResult } from "../services/organizationService";
+import type { CreateOrgEntryResponse } from "../apis/organizationApi";
 
 type AddOrganizationFormProps = {
-    onCreateOrgEntry: (first: string, last: string, role: string) => Promise<CreateOrgResult>;
+    onCreateOrgEntry: (first: string, last: string, role: string) => Promise<CreateOrgEntryResponse>;
 };
 
 export default function AddOrganizationForm(props: AddOrganizationFormProps) {
