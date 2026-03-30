@@ -2,19 +2,20 @@ import { useEffect, useState } from "react";
 import Directory from "../components/Directory";
 import AddEmployeeForm from "../components/AddEmployeeForm";
 
-import type { Department } from "../types";
-import { employeeRepo } from "../repository/employeeRepo";
-import { employeeService, type CreateEmployeeResult } from "../services/employeeService";
+import {
+  getDepartments,
+  createEmployee as createEmployeeApi,
+  type Department,
+  type CreateEmployeeResponse
+} from "../apis/employeeApi";
 
 export default function EmployeesPage() {
-  var repo = employeeRepo();
-  var service = employeeService(repo);
 
   var [departments, setDepartments] = useState<Department[]>([]);
 
   useEffect(() => {
     async function loadDepartments() {
-      var loadedDepartments = await service.getDepartments();
+      var loadedDepartments = await getDepartments();
       setDepartments(loadedDepartments);
     }
 
@@ -25,8 +26,8 @@ export default function EmployeesPage() {
     first: string,
     last: string,
     dept: string
-  ): Promise<CreateEmployeeResult> {
-    var result = await service.createEmployee(first, last, dept);
+  ): Promise<CreateEmployeeResponse> {
+    var result = await createEmployee(first, last, dept);
 
     if (result.ok) {
       setDepartments(result.departments);

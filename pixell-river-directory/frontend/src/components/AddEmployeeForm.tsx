@@ -1,10 +1,10 @@
 import type { Department } from "../types";
 import { useFormInput } from "../hooks/useFormInput";
-import type { CreateEmployeeResult } from "../services/employeeService";
+import type { CreateEmployeeResponse } from "../apis/employeeApi";
 
 type AddEmployeeFormProps = {
   departments: Department[];
-  onCreateEmployee: (first: string, last: string, dept: string) => Promise<CreateEmployeeResult>;
+  onCreateEmployee: (first: string, last: string, dept: string) => Promise<CreateEmployeeResponse>;
 };
 
 export default function AddEmployeeForm(props: AddEmployeeFormProps) {

@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
-import type { Role } from "../types";
-
-import { organizationRepo } from "../repository/organizationRepo";
-import { organizationService, type CreateOrgResult } from "../services/organizationService";
 import AddOrganizationForm from "./AddOrganizationForm";
+import {
+  getRoles,
+  createOrgEntry as createOrgEntryApi,
+  type Role,
+  type CreateOrgEntryResponse
+} from "../apis/organizationApi";
+
 
 export default function OrganizationPage() {
-  var repo = organizationRepo();
-  var service = organizationService(repo);
 
   var [roles, setRoles] = useState<Role[]>([]);
 
   useEffect(() => {
     async function loadRoles() {
-      var loadedRoles = await service.getRoles();
+      var loadedRoles = await getRoles();
       setRoles(loadedRoles);
     }
 
@@ -24,8 +25,12 @@ export default function OrganizationPage() {
     first: string,
     last: string,
     role: string
-  ): Promise<CreateOrgResult> {
-    var result = await service.createOrgEntry(first, last, role);
+  ): Promise<CreateOrgEntryResponse> {
+    var result = await createOrgEntryApi({
+      firstName: first,
+      lastName: last,
+      role: role
+    });
 
     if (result.ok) {
       setRoles(result.roles);
