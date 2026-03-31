@@ -42,7 +42,7 @@ function buildUrl(path: string): string {
 }
 
 export async function getDepartments(): Promise<GetDepartmentsResponse> {
-  const response = await fetch(buildUrl("/Roles"), {
+  const response = await fetch(buildUrl("/employees"), {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
