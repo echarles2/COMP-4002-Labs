@@ -38,7 +38,7 @@ function buildUrl(path: string): string {
 }
 
 export async function getRoles(): Promise<GetRolesResponse> {
-  const response = await fetch(buildUrl("/getDepartments"), {
+  const response = await fetch(buildUrl("/organization"), {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -55,7 +55,7 @@ export async function getRoles(): Promise<GetRolesResponse> {
 export async function createOrgEntry(
   args: CreateOrgEntryArgs
 ): Promise<CreateOrgEntryResponse> {
-  const response = await fetch(buildUrl("/getDepartments"), {
+  const response = await fetch(buildUrl("/organization"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
