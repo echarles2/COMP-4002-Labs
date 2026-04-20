@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_BASE_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 export type Role = {
   firstName: string;
@@ -53,12 +53,14 @@ export async function getRoles(): Promise<GetRolesResponse> {
 }
 
 export async function createOrgEntry(
-  args: CreateOrgEntryArgs
+  args: CreateOrgEntryArgs,
+  token: string | null
 ): Promise<CreateOrgEntryResponse> {
   const response = await fetch(buildUrl("/organization"), {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : ""
     },
     body: JSON.stringify({
       firstName: args.firstName,
@@ -66,6 +68,14 @@ export async function createOrgEntry(
       role: args.role
     })
   });
+
+  if (response.status === 400) {
+    return await response.json();
+  }
+
+  if (response.status === 401) {
+    throw new Error("You must be logged in to create an organization entry.");
+  }
 
   if (!response.ok) {
     throw new Error(`Failed to create organization entry. Status: ${response.status}`);
