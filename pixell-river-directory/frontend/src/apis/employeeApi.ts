@@ -57,12 +57,14 @@ export async function getDepartments(): Promise<GetDepartmentsResponse> {
 }
 
 export async function createEmployee(
-  args: CreateEmployeeArgs
+  args: CreateEmployeeArgs,
+  token: string | null
 ): Promise<CreateEmployeeResponse> {
   const response = await fetch(buildUrl("/employees"), {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : ""
     },
     body: JSON.stringify({
       firstName: args.firstName,
@@ -70,6 +72,14 @@ export async function createEmployee(
       departmentName: args.departmentName
     })
   });
+
+  if (response.status === 400) {
+    return await response.json();
+  }
+
+  if (response.status === 401) {
+    throw new Error("You must be logged in to create an employee.");
+  }
 
   if (!response.ok) {
     throw new Error(`Failed to create employee. Status: ${response.status}`);

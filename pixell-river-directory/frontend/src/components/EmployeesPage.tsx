@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { Show, useAuth } from "@clerk/react";
 import Directory from "../components/Directory";
 import AddEmployeeForm from "../components/AddEmployeeForm";
+import AuthRequiredNotice from "./AuthNotice";
 
 import {
   getDepartments,
@@ -10,11 +12,12 @@ import {
 } from "../apis/employeeApi";
 
 export default function EmployeesPage() {
-  var [departments, setDepartments] = useState<Department[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const { getToken } = useAuth();
 
   useEffect(() => {
     async function loadDepartments() {
-      var loadedDepartments = await getDepartments();
+      const loadedDepartments = await getDepartments();
       setDepartments(loadedDepartments);
     }
 
@@ -26,11 +29,16 @@ export default function EmployeesPage() {
     last: string,
     dept: string
   ): Promise<CreateEmployeeResponse> {
-    var result = await createEmployeeApi({
-      firstName: first,
-      lastName: last,
-      departmentName: dept
-    });
+    const token = await getToken();
+
+    const result = await createEmployeeApi(
+      {
+        firstName: first,
+        lastName: last,
+        departmentName: dept
+      },
+      token
+    );
 
     if (result.ok) {
       setDepartments(result.departments);
@@ -42,10 +50,20 @@ export default function EmployeesPage() {
   return (
     <>
       <Directory departments={departments} />
-      <AddEmployeeForm
-        departments={departments}
-        onCreateEmployee={createEmployee}
-      />
+
+      <Show when="signed-in">
+        <AddEmployeeForm
+          departments={departments}
+          onCreateEmployee={createEmployee}
+        />
+      </Show>
+
+      <Show when="signed-out">
+        <AuthRequiredNotice
+          title="Add Employee"
+          message="You can browse the directory without logging in, but you must log in to add a new employee."
+        />
+      </Show>
     </>
   );
 }
