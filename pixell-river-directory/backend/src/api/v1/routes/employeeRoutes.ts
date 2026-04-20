@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { getDepartments, createEmployee } from "../controllers/employeeController";
+import { requireAuth } from "../middleware/requireAuth";
 
-var router = Router();
+const router = Router();
 
 router.get("/", getDepartments);
-router.post("/", createEmployee);
+router.post("/", requireAuth, createEmployee);
 
 export default router;

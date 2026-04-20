@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { getRoles, createOrgEntry } from "../controllers/organizationController";
+import { requireAuth } from "../middleware/requireAuth";
 
-var router = Router();
+const router = Router();
 
 router.get("/", getRoles);
-router.post("/", createOrgEntry);
+router.post("/", requireAuth, createOrgEntry);
 
 export default router;
